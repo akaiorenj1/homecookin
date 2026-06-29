@@ -1,5 +1,6 @@
 const authBehavior = require('../../utils/behavior');
 const auth = require('../../utils/auth');
+const { db, recipes, inventory, orders } = require('../../utils/db');
 
 Page({
   behaviors: [authBehavior],
@@ -9,34 +10,40 @@ Page({
     todayMenu: [],
     lowStockCount: 0,
     pendingOrderCount: 0,
-    totalRecipes: 0
+    totalRecipes: 0,
+    loaded: false  // 防止重复加载
   },
 
   onShow() {
     const loggedIn = auth.isLoggedIn();
     this.setData({ hasLogin: loggedIn });
-    
-    if (loggedIn) {
+
+    if (loggedIn && !this.data.loaded) {
       this.loadDashboard();
     }
   },
 
+  onPullDownRefresh() {
+    this.loadDashboard().finally(() => wx.stopPullDownRefresh());
+  },
+
   async loadDashboard() {
-    const db = require('../../utils/db');
     try {
-      const [recipes, inventory, orders] = await Promise.all([
-        db.find(db.recipes, { orderBy: 'createTime', limit: 3 }),
+      const [recipeTotal, recentItems, allInventory, pendingOrders] = await Promise.all([
+        db.count(db.recipes),                                           // 总菜谱数（不受 limit 影响）
+        db.find(db.recipes, { orderBy: 'createTime', orderDir: 'desc', limit: 3 }),
         db.find(db.inventory, { orderBy: 'name' }),
         db.find(db.orders, { where: { status: 'pending' } })
       ]);
 
-      const lowStock = inventory.filter(item => item.quantity <= 100);
-      
+      const lowStock = allInventory.filter(item => item.quantity <= 100);
+
       this.setData({
-        todayMenu: recipes,
+        todayMenu: recentItems,
         lowStockCount: lowStock.length,
-        pendingOrderCount: orders.length,
-        totalRecipes: recipes.length
+        pendingOrderCount: pendingOrders.length,
+        totalRecipes: recipeTotal,  // ✅ 真实的菜谱总数
+        loaded: true
       });
     } catch (err) {
       console.error('加载首页数据失败:', err);
@@ -44,42 +51,27 @@ Page({
   },
 
   goToMenu() {
-    if (!auth.isLoggedIn()) {
-      wx.navigateTo({ url: '/pages/login/login' });
-      return;
-    }
+    if (!auth.isLoggedIn()) { wx.navigateTo({ url: '/pages/login/login' }); return; }
     wx.switchTab({ url: '/pages/menu/menu' });
   },
 
   goToInventory() {
-    if (!auth.isLoggedIn()) {
-      wx.navigateTo({ url: '/pages/login/login' });
-      return;
-    }
+    if (!auth.isLoggedIn()) { wx.navigateTo({ url: '/pages/login/login' }); return; }
     wx.switchTab({ url: '/pages/inventory/inventory' });
   },
 
   goToOrders() {
-    if (!auth.isLoggedIn()) {
-      wx.navigateTo({ url: '/pages/login/login' });
-      return;
-    }
+    if (!auth.isLoggedIn()) { wx.navigateTo({ url: '/pages/login/login' }); return; }
     wx.switchTab({ url: '/pages/orders/orders' });
   },
 
   goToRecipeManage() {
-    if (!auth.isLoggedIn()) {
-      wx.navigateTo({ url: '/pages/login/login' });
-      return;
-    }
+    if (!auth.isLoggedIn()) { wx.navigateTo({ url: '/pages/login/login' }); return; }
     wx.navigateTo({ url: '/pages/admin/recipe-manage/recipe-manage' });
   },
 
   goToInventoryLogs() {
-    if (!auth.isLoggedIn()) {
-      wx.navigateTo({ url: '/pages/login/login' });
-      return;
-    }
+    if (!auth.isLoggedIn()) { wx.navigateTo({ url: '/pages/login/login' }); return; }
     wx.navigateTo({ url: '/pages/inventory-logs/inventory-logs' });
   }
 });

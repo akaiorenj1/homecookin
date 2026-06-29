@@ -25,21 +25,15 @@
     "list": [
       {
         "pagePath": "pages/menu/menu",
-        "text": "菜谱",
-        "iconPath": "images/tab-menu.png",
-        "selectedIconPath": "images/tab-menu-active.png"
+        "text": "菜谱"
       },
       {
         "pagePath": "pages/inventory/inventory",
-        "text": "库存",
-        "iconPath": "images/tab-inventory.png",
-        "selectedIconPath": "images/tab-inventory-active.png"
+        "text": "库存"
       },
       {
         "pagePath": "pages/orders/orders",
-        "text": "订单",
-        "iconPath": "images/tab-orders.png",
-        "selectedIconPath": "images/tab-orders-active.png"
+        "text": "订单"
       }
     ]
   },

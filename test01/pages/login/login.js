@@ -7,35 +7,28 @@ Page({
   },
 
   onLoad() {
-    auth.clearAuth();
-    
-    // 已登录则直接跳转
+    // 已登录直接跳转，不再清除再检查
     if (auth.isLoggedIn()) {
       wx.switchTab({ url: '/pages/menu/menu' });
     }
   },
 
   /**
-   * 微信一键登录 — 调用云函数获取 openid 完成鉴权
+   * 微信静默登录 — 调用云函数获取 openid
+   * 基础库 2.27.1+ 已废弃 wx.getUserProfile，改用云函数获取 openid 做身份标识
    */
   async doLogin() {
     if (this.data.loading) return;
     this.setData({ loading: true, errorMsg: '' });
 
     try {
-      // 先获取微信用户信息
-      const profileRes = await wx.getUserProfile({ desc: '用于家庭成员识别' }).catch(() => null);
-      
       const result = await auth.cloudLogin();
-      
+
       if (result.success) {
         wx.showToast({ title: '登录成功', icon: 'success' });
-        
-        setTimeout(() => {
-          wx.switchTab({ url: '/pages/menu/menu' });
-        }, 1200);
+        setTimeout(() => wx.switchTab({ url: '/pages/menu/menu' }), 1000);
       } else {
-        this.setData({ errorMsg: result.error || '登录失败，请重试' });
+        this.setData({ errorMsg: result.error || '登录失败，请确认云开发环境已配置' });
       }
     } catch (err) {
       console.error('登录失败:', err);
@@ -46,7 +39,7 @@ Page({
   },
 
   /**
-   * 备用：密码登录（用于无法获取用户信息时）
+   * 备用密码登录 — 当云开发环境未配置时的兜底
    */
   showPasswordLogin() {
     wx.showModal({
@@ -58,7 +51,7 @@ Page({
         if (res.confirm && res.content === '123456') {
           auth.saveAuth({ nickname: '家庭成员', role: 'member' });
           wx.showToast({ title: '登录成功', icon: 'success' });
-          setTimeout(() => wx.switchTab({ url: '/pages/menu/menu' }), 1200);
+          setTimeout(() => wx.switchTab({ url: '/pages/menu/menu' }), 1000);
         } else if (res.confirm) {
           wx.showToast({ title: '密码错误', icon: 'none' });
         }
