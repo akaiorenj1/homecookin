@@ -1,17 +1,9 @@
-const db = wx.cloud.database();
-const _ = db.command;
+const authBehavior = require('../../utils/behavior');
+const { db, _, orders, inventory, inventoryLogs } = require('../../utils/db');
+const { getInventoryMap } = require('../../utils/db');
 
 Page({
-  onShow() {
-    this.checkAuth();
-  },
-
-  checkAuth() {
-    const isAuthorized = wx.getStorageSync('isAuthorized');
-    if (!isAuthorized) {
-      wx.reLaunch({ url: '/pages/login/login' });
-    }
-  },
+  behaviors: [authBehavior],
 
   data: {
     currentTab: 'pending',
@@ -22,183 +14,90 @@ Page({
   },
 
   onLoad() {
-    this.setTodayDate();
+    this.setToday();
     this.initWatch();
   },
 
   onUnload() {
-    if (this._ordersWatch) {
-      this._ordersWatch.close();
-    }
-  },
-
-  setTodayDate() {
-    const now = new Date();
-    const today = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
-    this.setData({ today });
-  },
-
-  initWatch() {
-    const that = this;
-    this._ordersWatch = db.collection('orders')
-      .where({
-        status: 'pending'
-      })
-      .orderBy('createTime', 'desc')
-      .watch({
-        onChange: function(snapshot) {
-          const list = snapshot.docs.map(item => {
-            const createTime = item.createTime ? new Date(item.createTime) : new Date();
-            const timeStr = `${createTime.getHours().toString().padStart(2, '0')}:${createTime.getMinutes().toString().padStart(2, '0')}`;
-            const dateStr = `${createTime.getFullYear()}-${String(createTime.getMonth() + 1).padStart(2, '0')}-${String(createTime.getDate()).padStart(2, '0')} ${timeStr}`;
-            return { ...item, createTimeFormat: timeStr, createDateFormat: dateStr };
-          });
-          that.setData({
-            ordersList: list,
-            loading: false
-          });
-          that.calculateShoppingList(list);
-        },
-        onError: function(err) {
-          console.error('监听订单变化失败:', err);
-        }
-      });
+    if (this._watch) this._watch.close();
   },
 
   onShow() {
-    this.setTodayDate();
-    if (!this.data.ordersList.length) {
-      this.loadOrders();
-    } else {
-      this.calculateShoppingList(this.data.ordersList);
-    }
+    this.setToday();
   },
 
   onPullDownRefresh() {
-    this.loadOrders().then(() => {
-      wx.stopPullDownRefresh();
+    this.loadOrders().then(() => wx.stopPullDownRefresh());
+  },
+
+  setToday() {
+    const now = new Date();
+    this.setData({ today: `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日` });
+  },
+
+  initWatch() {
+    this._watch = orders.where({ status: 'pending' }).orderBy('createTime', 'desc').watch({
+      onChange: (snapshot) => {
+        const list = this.formatOrders(snapshot.docs);
+        this.setData({ ordersList: list, loading: false });
+        this.calcShopping(list);
+      },
+      onError: (err) => console.error('订单监听失败:', err)
+    });
+  },
+
+  formatOrders(list) {
+    return list.map(item => {
+      const t = item.createTime ? new Date(item.createTime) : new Date();
+      return { ...item, createTimeFormat: `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`, createDateFormat: `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}` };
     });
   },
 
   switchTab(e) {
     const tab = e.currentTarget.dataset.tab;
-    
-    if (this._ordersWatch) {
-      this._ordersWatch.close();
-    }
-    
-    this.setData({ 
-      currentTab: tab,
-      ordersList: [],
-      shoppingList: []
-    });
-    
-    if (tab === 'pending') {
-      this.initWatch();
-    } else {
-      this.loadOrders();
-    }
+    if (this._watch) this._watch.close();
+    this.setData({ currentTab: tab, ordersList: [], shoppingList: [] });
+    if (tab === 'pending') this.initWatch();
+    else this.loadOrders();
   },
 
   async loadOrders() {
     this.setData({ loading: true });
-    
     try {
-      const res = await db.collection('orders')
-        .where({
-          status: this.data.currentTab
-        })
-        .orderBy('createTime', 'desc')
-        .get();
-      
-      const list = res.data.map(item => {
-        const createTime = item.createTime ? new Date(item.createTime) : new Date();
-        const timeStr = `${createTime.getHours().toString().padStart(2, '0')}:${createTime.getMinutes().toString().padStart(2, '0')}`;
-        const dateStr = `${createTime.getFullYear()}-${String(createTime.getMonth() + 1).padStart(2, '0')}-${String(createTime.getDate()).padStart(2, '0')} ${timeStr}`;
-        return { ...item, createTimeFormat: timeStr, createDateFormat: dateStr };
-      });
-      
-      this.setData({
-        ordersList: list,
-        loading: false
-      });
-
-      if (this.data.currentTab === 'pending') {
-        this.calculateShoppingList(list);
-      }
+      const res = await orders.where({ status: this.data.currentTab }).orderBy('createTime', 'desc').get();
+      this.setData({ ordersList: this.formatOrders(res.data), loading: false });
     } catch (err) {
       console.error('加载订单失败:', err);
       this.setData({ loading: false });
     }
   },
 
-  async calculateShoppingList(orders) {
-    if (orders.length === 0) {
-      this.setData({ shoppingList: [] });
-      return;
-    }
-
+  async calcShopping(orderList) {
+    if (!orderList.length) { this.setData({ shoppingList: [] }); return; }
     try {
-      const inventoryRes = await db.collection('inventory').get();
-      const inventoryMap = {};
-      inventoryRes.data.forEach(item => {
-        inventoryMap[item.name] = { quantity: item.quantity, unit: item.unit };
-      });
-
-      const requiredIngredients = {};
-      orders.forEach(order => {
-        const recipeIngredients = order.ingredients || [];
-        recipeIngredients.forEach(ing => {
-          if (requiredIngredients[ing.ingredientName]) {
-            requiredIngredients[ing.ingredientName] += ing.quantity;
-          } else {
-            requiredIngredients[ing.ingredientName] = ing.quantity;
-          }
-        });
-      });
-
-      const shoppingList = [];
-      for (const [name, needQty] of Object.entries(requiredIngredients)) {
-        const currentInfo = inventoryMap[name] || { quantity: 0, unit: 'g' };
-        const diff = needQty - currentInfo.quantity;
-        if (diff > 0) {
-          shoppingList.push({
-            name: name,
-            needQuantity: Math.ceil(diff),
-            unit: currentInfo.unit || 'g',
-            currentQuantity: currentInfo.quantity
-          });
-        }
+      const invMap = await getInventoryMap();
+      const needed = {};
+      orderList.forEach(o => (o.ingredients || []).forEach(ing => {
+        needed[ing.ingredientName] = (needed[ing.ingredientName] || 0) + ing.quantity;
+      }));
+      const list = [];
+      for (const [name, need] of Object.entries(needed)) {
+        const cur = invMap[name] || { quantity: 0, unit: 'g' };
+        const diff = need - cur.quantity;
+        if (diff > 0) list.push({ name, needQuantity: Math.ceil(diff), unit: cur.unit, currentQuantity: cur.quantity });
       }
-
-      this.setData({ shoppingList });
-    } catch (err) {
-      console.error('计算采购清单失败:', err);
-    }
+      this.setData({ shoppingList: list });
+    } catch (err) { console.error('计算采购清单失败:', err); }
   },
 
   deleteOrder(e) {
-    const orderId = e.currentTarget.dataset.id;
-    const orderName = e.currentTarget.dataset.name;
-    
     wx.showModal({
       title: '删除订单',
-      content: `确定要删除「${orderName}」吗？`,
+      content: `确定要删除「${e.currentTarget.dataset.name}」吗？`,
       success: async (res) => {
         if (res.confirm) {
-          try {
-            await db.collection('orders').doc(orderId).remove();
-            wx.showToast({
-              title: '已删除',
-              icon: 'success'
-            });
-          } catch (err) {
-            console.error('删除失败:', err);
-            wx.showToast({
-              title: '删除失败',
-              icon: 'none'
-            });
-          }
+          await orders.doc(e.currentTarget.dataset.id).remove();
+          wx.showToast({ title: '已删除', icon: 'success' });
         }
       }
     });
@@ -206,106 +105,46 @@ Page({
 
   async completeOrder(e) {
     const orderId = e.currentTarget.dataset.id;
-    
     wx.showModal({
       title: '确认完成',
       content: '完成后将自动扣减库存，确定吗？',
       success: async (res) => {
-        if (res.confirm) {
-          try {
-            const orderRes = await db.collection('orders').doc(orderId).get();
-            const order = orderRes.data;
-            
-            if (!order.ingredients || order.ingredients.length === 0) {
-              wx.showToast({
-                title: '没有食材信息',
-                icon: 'none'
-              });
-              return;
-            }
+        if (!res.confirm) return;
+        try {
+          const order = (await orders.doc(orderId).get()).data;
+          if (!order.ingredients?.length) { wx.showToast({ title: '没有食材信息', icon: 'none' }); return; }
 
-            const inventoryRes = await db.collection('inventory').get();
-            const inventoryMap = {};
-            inventoryRes.data.forEach(item => {
-              inventoryMap[item.name] = { 
-                quantity: item.quantity, 
-                _id: item._id,
-                unit: item.unit
-              };
-            });
+          const invMap = await getInventoryMap();
+          const missing = [];
+          for (const ing of order.ingredients) {
+            const inv = invMap[ing.ingredientName];
+            if (!inv) missing.push(`${ing.ingredientName}（无库存）`);
+            else if (inv.quantity < ing.quantity) missing.push(`${ing.ingredientName}（需${ing.quantity}，库存${inv.quantity}）`);
+          }
+          if (missing.length) {
+            wx.showToast({ title: `库存不足：${missing.join('、')}`, icon: 'none', duration: 3000 });
+            return;
+          }
 
-            const insufficientItems = [];
-            const missingItems = [];
-            
-            for (const ing of order.ingredients) {
-              const inventoryItem = inventoryMap[ing.ingredientName];
-              
-              if (!inventoryItem) {
-                missingItems.push(ing.ingredientName);
-              } else if (inventoryItem.quantity < ing.quantity) {
-                insufficientItems.push(`${ing.ingredientName}（需要${ing.quantity}，库存${inventoryItem.quantity}）`);
-              }
-            }
-
-            if (missingItems.length > 0) {
-              wx.showToast({
-                title: `缺少食材：${missingItems.join('、')}`,
-                icon: 'none',
-                duration: 3000
-              });
-              return;
-            }
-
-            if (insufficientItems.length > 0) {
-              wx.showToast({
-                title: `库存不足：${insufficientItems.join('、')}`,
-                icon: 'none',
-                duration: 3000
-              });
-              return;
-            }
-
-            for (const ing of order.ingredients) {
-              const inventoryItem = inventoryMap[ing.ingredientName];
-              if (inventoryItem) {
-                await db.collection('inventory').doc(inventoryItem._id).update({
-                  data: {
-                    quantity: _.inc(-ing.quantity)
-                  }
-                });
-
-                await db.collection('inventory_logs').add({
-                  data: {
-                    ingredientName: ing.ingredientName,
-                    quantity: ing.quantity,
-                    unit: inventoryItem.unit || ing.unit || 'g',
-                    type: 'out',
-                    description: `做菜消耗：${order.recipeName}`,
-                    createTime: db.serverDate()
-                  }
-                });
-              }
-            }
-            
-            await db.collection('orders').doc(orderId).update({
-              data: {
-                status: 'completed'
-              }
-            });
-            
-            wx.showToast({
-              title: '已完成',
-              icon: 'success'
-            });
-          } catch (err) {
-            console.error('更新订单状态失败:', err);
-            wx.showToast({
-              title: '操作失败',
-              icon: 'none'
+          for (const ing of order.ingredients) {
+            const inv = invMap[ing.ingredientName];
+            await inventory.doc(inv._id).update({ data: { quantity: _.inc(-ing.quantity) } });
+            await inventoryLogs.add({
+              data: { ingredientName: ing.ingredientName, quantity: ing.quantity, unit: inv.unit, type: 'out', description: `做菜消耗：${order.recipeName}`, createTime: db.serverDate() }
             });
           }
-        }
+
+          await orders.doc(orderId).update({ data: { status: 'completed' } });
+          wx.showToast({ title: '已完成', icon: 'success' });
+        } catch (err) { wx.showToast({ title: '操作失败', icon: 'none' }); }
       }
     });
+  },
+
+  /** 复制采购清单 */
+  copyShoppingList() {
+    const text = this.data.shoppingList.map(i => `${i.name} ×${i.needQuantity}${i.unit}`).join('\n');
+    if (!text) { wx.showToast({ title: '暂无采购项目', icon: 'none' }); return; }
+    wx.setClipboardData({ data: text, success: () => wx.showToast({ title: '已复制', icon: 'success' }) });
   }
 });

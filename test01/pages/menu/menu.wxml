@@ -1,57 +1,63 @@
 <view class="container">
-  <view class="category-tabs">
-    <view 
-      class="tab-item {{currentCategory === 'main' ? 'active' : ''}}" 
-      bindtap="switchCategory" 
-      data-category="main">
-      🥘 菜品
-    </view>
-    <view 
-      class="tab-item {{currentCategory === 'drink' ? 'active' : ''}}" 
-      bindtap="switchCategory" 
-      data-category="drink">
-      ☕ 饮品
-    </view>
-    <view 
-      class="tab-item {{currentCategory === 'dessert' ? 'active' : ''}}" 
-      bindtap="switchCategory" 
-      data-category="dessert">
-      🍰 甜品
-    </view>
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <input 
+      class="search-input" 
+      placeholder="搜索菜谱..." 
+      bindinput="onSearchInput" 
+      value="{{searchKeyword}}"
+    />
+    <text class="search-icon">🔍</text>
   </view>
 
-  <view class="menu-list">
+  <!-- 分类标签 -->
+  <scroll-view scroll-x class="category-bar">
     <view 
-      class="menu-item" 
+      wx:for="{{categories}}" 
+      wx:key="value" 
+      class="category-item {{currentCategory === item.value ? 'active' : ''}}"
+      data-category="{{item.value}}"
+      bindtap="switchCategory"
+    >{{item.label}}</view>
+  </scroll-view>
+
+  <!-- 菜谱列表 -->
+  <view wx:if="{{!loading && menuList.length === 0}}" class="empty-state">
+    <text class="empty-icon">🍽️</text>
+    <text class="empty-text">暂无菜谱</text>
+    <button class="btn btn-primary mt-lg" bindtap="goToAddRecipe">添加菜谱</button>
+  </view>
+
+  <view wx:elif="{{!loading}}" class="recipe-grid">
+    <view 
       wx:for="{{menuList}}" 
-      wx:key="_id"
-      bindtap="goToDetail" 
-      data-id="{{item._id}}">
-      <image 
-        class="menu-image" 
-        src="{{item.image || '/images/default-food.png'}}" 
-        mode="aspectFill">
-      </image>
-      <view class="menu-info">
-        <view class="menu-name">{{item.name}}</view>
-        <view class="menu-time">🕐 {{item.cookingTime}}分钟</view>
-        <view class="menu-tags">
-          <text class="tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+      wx:key="_id" 
+      class="recipe-card card card--hover"
+      bindtap="goToDetail"
+      bindlongpress="quickOrder"
+      data-id="{{item._id}}"
+      data-item="{{item}}"
+    >
+      <view class="recipe-img-wrap">
+        <image wx:if="{{item.image}}" src="{{item.image}}" mode="aspectFill" class="recipe-img" />
+        <text wx:else class="recipe-img-placeholder">🍲</text>
+        <view class="recipe-time-tag">
+          <text>{{item.cookingTime}}min</text>
         </view>
       </view>
-      <view class="menu-order-btn">点菜</view>
-    </view>
-
-    <view class="empty-tip" wx:if="{{menuList.length === 0 && !loading}}">
-      <text>暂无菜品</text>
+      <view class="recipe-info">
+        <text class="recipe-name">{{item.name}}</text>
+        <text class="recipe-ing-count">{{item.ingredients.length}} 种食材</text>
+      </view>
     </view>
   </view>
 
-  <view class="loading" wx:if="{{loading}}">
+  <view wx:else class="loading-container">
     <text>加载中...</text>
   </view>
 
-  <view class="add-btn" bindtap="goToAddRecipe">
-    <text>+</text>
+  <!-- 添加按钮 -->
+  <view class="fab" bindtap="goToAddRecipe">
+    <text class="fab-icon">+</text>
   </view>
 </view>

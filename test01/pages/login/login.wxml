@@ -1,26 +1,27 @@
-<view class="container">
+<view class="login-container">
   <view class="login-card">
-    <view class="app-name">🏠 家常厨房</view>
-    <view class="app-desc">请输入访问密码</view>
-    
-    <view class="input-group">
-      <input 
-        class="password-input" 
-        password 
-        placeholder="请输入访问密码" 
-        bindinput="onPasswordInput"
-        value="{{password}}"
-      />
+    <view class="logo-area">
+      <text class="logo-icon">🍳</text>
+      <text class="app-name">家常厨房</text>
+      <text class="app-desc">家庭食谱 · 食材管理</text>
     </view>
-    
-    <view class="error-tip" wx:if="{{errorMsg}}">
-      {{errorMsg}}
+
+    <button 
+      class="login-btn primary-btn" 
+      bindtap="doLogin"
+      loading="{{loading}}"
+      disabled="{{loading}}"
+    >
+      <text wx:if="{{!loading}}">微信一键登录</text>
+      <text wx:else>登录中...</text>
+    </button>
+
+    <view class="alt-login" bindtap="showPasswordLogin">
+      <text class="alt-text">备用密码登录</text>
     </view>
-    
-    <button class="login-btn" bindtap="doLogin">确认</button>
-    
-    <view class="tips">
-      <text>仅限授权用户访问</text>
+
+    <view wx:if="{{errorMsg}}" class="error-msg">
+      <text>{{errorMsg}}</text>
     </view>
   </view>
 </view>

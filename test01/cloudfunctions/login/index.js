@@ -5,49 +5,33 @@ const db = cloud.database();
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
-  const { userInfo } = event;
+  const openId = wxContext.OPENID;
 
   try {
-    const openId = wxContext.OPENID;
-
-    const existUser = await db.collection('users').where({
-      openId: openId
-    }).get();
+    const existUser = await db.collection('users').where({ openId }).get();
 
     if (existUser.data.length > 0) {
-      await db.collection('users').doc(existUser.data[0]._id).update({
-        data: {
-          nickname: userInfo.nickName,
-          avatar: userInfo.avatarUrl,
-          lastLoginTime: db.serverDate()
-        }
+      const user = existUser.data[0];
+      await db.collection('users').doc(user._id).update({
+        data: { lastLoginTime: db.serverDate() }
       });
-
-      return {
-        success: true,
-        user: { ...existUser.data[0], nickname: userInfo.nickName, avatar: userInfo.avatarUrl },
-        isNew: false
-      };
-    } else {
-      const newUser = {
-        openId: openId,
-        nickname: userInfo.nickName || '家庭成员',
-        avatar: userInfo.avatarUrl || '',
-        role: 'member',
-        createTime: db.serverDate(),
-        lastLoginTime: db.serverDate()
-      };
-
-      const addRes = await db.collection('users').add({
-        data: newUser
-      });
-
-      return {
-        success: true,
-        user: { _id: addRes._id, ...newUser },
-        isNew: true
-      };
+      return { success: true, user, isNew: false };
     }
+
+    // 新用户自动注册
+    const newUser = {
+      openId,
+      nickname: '家庭成员',
+      avatar: '',
+      role: 'member', // 默认 member，管理员在云函数 setAdmin 中设置
+      createTime: db.serverDate(),
+      lastLoginTime: db.serverDate()
+    };
+
+    const addRes = await db.collection('users').add({ data: newUser });
+    newUser._id = addRes._id;
+
+    return { success: true, user: newUser, isNew: true };
   } catch (e) {
     return { success: false, error: e.message };
   }

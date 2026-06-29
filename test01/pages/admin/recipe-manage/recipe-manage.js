@@ -1,17 +1,8 @@
-const db = wx.cloud.database();
+const authBehavior = require('../../utils/behavior');
+const { recipes } = require('../../utils/db');
 
 Page({
-  onShow() {
-    this.checkAuth();
-    this.loadMenu();
-  },
-
-  checkAuth() {
-    const isAuthorized = wx.getStorageSync('isAuthorized');
-    if (!isAuthorized) {
-      wx.reLaunch({ url: '/pages/login/login' });
-    }
-  },
+  behaviors: [authBehavior],
 
   data: {
     currentCategory: 'main',
@@ -19,52 +10,36 @@ Page({
     loading: true
   },
 
+  onShow() {
+    this.loadMenu();
+  },
+
   switchCategory(e) {
-    const category = e.currentTarget.dataset.category;
-    this.setData({ currentCategory: category });
+    this.setData({ currentCategory: e.currentTarget.dataset.category });
     this.loadMenu();
   },
 
   async loadMenu() {
     this.setData({ loading: true });
     try {
-      const res = await db.collection('recipes')
-        .where({ category: this.data.currentCategory })
-        .orderBy('createTime', 'desc')
-        .get();
-      
-      this.setData({
-        menuList: res.data,
-        loading: false
-      });
-    } catch (err) {
-      console.error('加载菜单失败:', err);
-      this.setData({ loading: false });
-    }
+      const res = await recipes.where({ category: this.data.currentCategory }).orderBy('createTime', 'desc').get();
+      this.setData({ menuList: res.data, loading: false });
+    } catch (err) { console.error('加载失败:', err); this.setData({ loading: false }); }
   },
 
   editRecipe(e) {
-    const id = e.currentTarget.dataset.id;
-    wx.navigateTo({ url: `/pages/admin/recipe-edit/recipe-edit?id=${id}` });
+    wx.navigateTo({ url: `/pages/admin/recipe-edit/recipe-edit?id=${e.currentTarget.dataset.id}` });
   },
 
   deleteRecipe(e) {
-    const id = e.currentTarget.dataset.id;
-    const name = e.currentTarget.dataset.name;
-    
     wx.showModal({
       title: '删除菜品',
-      content: `确定要删除「${name}」吗？`,
+      content: `确定要删除「${e.currentTarget.dataset.name}」吗？`,
       success: async (res) => {
         if (res.confirm) {
-          try {
-            await db.collection('recipes').doc(id).remove();
-            wx.showToast({ title: '已删除', icon: 'success' });
-            this.loadMenu();
-          } catch (err) {
-            console.error('删除失败:', err);
-            wx.showToast({ title: '删除失败', icon: 'none' });
-          }
+          await recipes.doc(e.currentTarget.dataset.id).remove();
+          wx.showToast({ title: '已删除', icon: 'success' });
+          this.loadMenu();
         }
       }
     });
@@ -72,9 +47,5 @@ Page({
 
   goToAddRecipe() {
     wx.navigateTo({ url: '/pages/admin/recipe-edit/recipe-edit' });
-  },
-
-  goBack() {
-    wx.navigateBack();
   }
 });

@@ -1,50 +1,44 @@
-<view class="container" wx:if="{{recipe}}">
-  <view class="recipe-header">
-    <image 
-      class="recipe-image" 
-      src="{{recipe.image || '/images/default-food.png'}}" 
-      mode="aspectFill">
-    </image>
-    <view class="recipe-title">{{recipe.name}}</view>
-    <view class="recipe-meta">
-      <text class="meta-item">🕐 {{recipe.cookingTime}}分钟</text>
+<view wx:if="{{recipe}}" class="container">
+  <!-- 图片 -->
+  <view class="detail-img-wrap">
+    <image wx:if="{{recipe.image}}" src="{{recipe.image}}" mode="aspectFill" class="detail-img" />
+    <text wx:else class="detail-img-placeholder">🍲</text>
+    <view class="detail-meta">
+      <text class="detail-time">⏱ {{recipe.cookingTime}} 分钟</text>
+      <text class="detail-cat">📂 {{recipe.category === 'main' ? '菜品' : recipe.category === 'drink' ? '饮品' : '甜品'}}</text>
     </view>
   </view>
 
-  <view class="section">
-    <view class="section-title">所需食材</view>
-    <view class="ingredient-list" wx:if="{{recipe.ingredients && recipe.ingredients.length > 0}}">
-      <view 
-        class="ingredient-item" 
-        wx:for="{{recipe.ingredients}}" 
-        wx:key="index">
-        <view class="ingredient-name">{{item.ingredientName}}</view>
-        <view class="ingredient-quantity">{{item.quantity}}{{item.unit || 'g'}}</view>
+  <!-- 菜名 -->
+  <text class="detail-name">{{recipe.name}}</text>
+
+  <!-- 食材列表 -->
+  <view class="card mt-md">
+    <text class="section-title">所需食材</text>
+    <view wx:if="{{recipe.ingredients.length > 0}}" class="ingredient-list">
+      <view wx:for="{{recipe.ingredients}}" wx:key="index" class="ingredient-item">
+        <text class="ing-dot">•</text>
+        <text class="ing-name">{{item.ingredientName}}</text>
+        <text class="ing-qty">{{item.quantity}}{{item.unit}}</text>
       </view>
     </view>
-    <view class="empty-tip" wx:else>
-      <text>暂未添加食材</text>
-    </view>
+    <text wx:else class="empty-text">暂无食材信息</text>
   </view>
 
-  <view class="section">
-    <view class="section-title">制作方法</view>
-    <view class="method-content">
-      <text>{{recipe.method || '暂无制作方法'}}</text>
-    </view>
+  <!-- 做法 -->
+  <view wx:if="{{recipe.method}}" class="card mt-md">
+    <text class="section-title">制作方法</text>
+    <text class="method-text">{{recipe.method}}</text>
   </view>
 
-  <view class="action-bar">
-    <view class="order-btn" bindtap="orderRecipe">
-      <text>点这个菜</text>
-    </view>
+  <!-- 点菜按钮 -->
+  <view class="bottom-bar">
+    <button class="btn btn-primary btn-block" bindtap="orderRecipe">
+      点这道菜 🍳
+    </button>
   </view>
 </view>
 
-<view class="loading-container" wx:elif="{{loading}}">
+<view wx:elif="{{loading}}" class="loading-container">
   <text>加载中...</text>
-</view>
-
-<view class="error-container" wx:else>
-  <text>菜品不存在</text>
 </view>

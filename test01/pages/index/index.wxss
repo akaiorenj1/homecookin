@@ -1,78 +1,172 @@
-.welcome-card {
-  background: linear-gradient(180deg, #6b8e23 0%, #556b2f 100%);
-  border-radius: 16rpx;
-  padding: 50rpx 30rpx;
+.header {
+  padding: 40rpx 0 32rpx;
+}
+
+.greeting {
+  display: block;
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 8rpx;
+}
+
+.date-sub {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+}
+
+/* 快捷入口 */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.quick-card {
+  background: var(--color-card);
+  border-radius: var(--radius-md);
+  padding: 28rpx 16rpx;
   text-align: center;
-  margin-bottom: 30rpx;
-  border: 4rpx solid #3d4a1d;
-  box-shadow: 6rpx 6rpx 0 #3d4a1d;
+  box-shadow: var(--shadow-sm);
+  position: relative;
 }
 
-.welcome-title {
-  font-size: 44rpx;
-  font-weight: bold;
-  color: #fff8dc;
-  text-shadow: 2rpx 2rpx 0 #3d4a1d;
+.quick-icon {
+  display: block;
+  font-size: 48rpx;
+  margin-bottom: 8rpx;
 }
 
-.welcome-subtitle {
-  font-size: 32rpx;
-  color: #f5deb3;
-  margin-top: 10rpx;
-  text-shadow: 1rpx 1rpx 0 #3d4a1d;
+.quick-label {
+  font-size: var(--font-xs);
+  color: var(--color-text-secondary);
 }
 
-.nav-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20rpx;
-}
-
-.nav-item {
-  width: 44%;
-  background-color: #fff8dc;
-  border-radius: 12rpx;
-  padding: 40rpx 20rpx;
+.quick-badge {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  min-width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 20rpx;
+  border-radius: var(--radius-full);
   text-align: center;
+  padding: 0 8rpx;
+}
+
+.quick-badge.badge-warning {
+  background: var(--color-danger);
+}
+
+/* 今日推荐滚动 */
+.section {
+  margin-bottom: 32rpx;
+}
+
+.section-title {
+  font-size: var(--font-lg);
+  font-weight: 700;
   margin-bottom: 20rpx;
-  border: 3rpx solid #8b4513;
-  box-shadow: 4rpx 4rpx 0 rgba(139, 69, 19, 0.3);
 }
 
-.nav-item:active {
-  transform: translate(2rpx, 2rpx);
-  box-shadow: 2rpx 2rpx 0 rgba(139, 69, 19, 0.3);
+.recipe-scroll {
+  display: flex;
+  white-space: nowrap;
 }
 
-.nav-icon {
-  font-size: 64rpx;
-  margin-bottom: 16rpx;
+.recipe-card-sm {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 160rpx;
+  margin-right: 20rpx;
 }
 
-.nav-text {
-  font-size: 28rpx;
-  color: #6b8e23;
-  font-weight: bold;
+.recipe-img-sm {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: var(--radius-md);
+  margin-bottom: 8rpx;
 }
 
-.login-section {
+.recipe-img-placeholder {
+  width: 120rpx;
+  height: 120rpx;
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56rpx;
+  margin-bottom: 8rpx;
+}
+
+.recipe-name-sm {
+  font-size: var(--font-xs);
+  color: var(--color-text);
+  max-width: 120rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 提醒卡片 */
+.alert-card {
+  display: flex;
+  align-items: center;
+  background: rgba(255,71,87,0.06);
+  border: 2rpx solid rgba(255,71,87,0.2);
+  border-radius: var(--radius-md);
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.alert-icon {
+  font-size: 40rpx;
+  margin-right: 16rpx;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-title {
+  display: block;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-danger);
+}
+
+.alert-desc {
+  font-size: var(--font-xs);
+  color: var(--color-text-secondary);
+}
+
+.alert-arrow {
+  font-size: var(--font-md);
+  color: var(--color-text-muted);
+}
+
+/* 管理入口 */
+.admin-section {
   margin-top: 40rpx;
-  text-align: center;
+  padding-top: 24rpx;
+  border-top: 2rpx solid var(--color-border);
 }
 
-.login-btn {
-  background-color: #cd853f;
-  color: #fff8dc;
-  font-size: 28rpx;
-  font-weight: bold;
-  padding: 20rpx 60rpx;
-  border-radius: 12rpx;
-  border: 4rpx solid #8b4513;
-  box-shadow: 4rpx 4rpx 0 #8b4513;
+.admin-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
 }
 
-.login-btn:active {
-  transform: translate(2rpx, 2rpx);
-  box-shadow: 2rpx 2rpx 0 #8b4513;
+.link-arrow {
+  color: var(--color-text-muted);
 }

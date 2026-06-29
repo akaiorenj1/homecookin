@@ -12,28 +12,34 @@
     "pages/admin/ingredient-edit/ingredient-edit"
   ],
   "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#6b8e23",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#ff6b35",
     "navigationBarTitleText": "家常厨房",
     "navigationBarTextStyle": "white"
   },
   "tabBar": {
-    "color": "#8b4513",
-    "selectedColor": "#6b8e23",
-    "backgroundColor": "#fff8dc",
-    "borderStyle": "white",
+    "color": "#b2bec3",
+    "selectedColor": "#ff6b35",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/menu/menu",
-        "text": "点菜"
+        "text": "菜谱",
+        "iconPath": "images/tab-menu.png",
+        "selectedIconPath": "images/tab-menu-active.png"
       },
       {
         "pagePath": "pages/inventory/inventory",
-        "text": "库存"
+        "text": "库存",
+        "iconPath": "images/tab-inventory.png",
+        "selectedIconPath": "images/tab-inventory-active.png"
       },
       {
         "pagePath": "pages/orders/orders",
-        "text": "订单"
+        "text": "订单",
+        "iconPath": "images/tab-orders.png",
+        "selectedIconPath": "images/tab-orders-active.png"
       }
     ]
   },

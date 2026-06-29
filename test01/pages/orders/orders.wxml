@@ -1,81 +1,53 @@
 <view class="container">
-  <view class="orders-header">
-    <view class="orders-title">🍽️ 今日点菜</view>
-    <view class="orders-date">{{today}}</view>
-  </view>
+  <text class="page-date">📅 {{today}}</text>
 
-  <view class="tabs">
-    <view 
-      class="tab-item {{currentTab === 'pending' ? 'active' : ''}}" 
-      bindtap="switchTab" 
-      data-tab="pending">
-      ⏳ 待制作
+  <!-- 采购清单 -->
+  <view wx:if="{{shoppingList.length > 0}}" class="shopping-card card">
+    <view class="shop-header">
+      <text class="shop-title">🛒 采购清单</text>
+      <text class="shop-copy" bindtap="copyShoppingList">复制</text>
     </view>
-    <view 
-      class="tab-item {{currentTab === 'completed' ? 'active' : ''}}" 
-      bindtap="switchTab" 
-      data-tab="completed">
-      ✅ 已完成
+    <view wx:for="{{shoppingList}}" wx:key="name" class="shop-item">
+      <text class="shop-name">{{item.name}}</text>
+      <text class="shop-diff">缺 {{item.needQuantity}}{{item.unit}}</text>
     </view>
   </view>
 
-  <view class="orders-list">
-    <view 
-      class="order-item" 
-      wx:for="{{ordersList}}" 
-      wx:key="_id">
-      <image 
-        class="order-image" 
-        src="{{item.recipeImage || '/images/default-food.png'}}" 
-        mode="aspectFill">
-      </image>
-      <view class="order-info">
-        <view class="order-name">{{item.recipeName}}</view>
-        <view class="order-time" wx:if="{{currentTab === 'pending'}}">{{item.createTimeFormat}}</view>
-        <view class="order-time" wx:else>{{item.createDateFormat}}</view>
-      </view>
-      <view class="order-actions" wx:if="{{currentTab === 'pending'}}">
-        <view 
-          class="order-btn delete" 
-          bindtap="deleteOrder" 
-          data-id="{{item._id}}"
-          data-name="{{item.recipeName}}">
-          删除
+  <!-- 订单 Tab -->
+  <view class="order-tabs">
+    <view class="tab-item {{currentTab === 'pending' ? 'active' : ''}}" data-tab="pending" bindtap="switchTab">
+      <text>待处理</text>
+    </view>
+    <view class="tab-item {{currentTab === 'completed' ? 'active' : ''}}" data-tab="completed" bindtap="switchTab">
+      <text>已完成</text>
+    </view>
+  </view>
+
+  <!-- 订单列表 -->
+  <view wx:if="{{!loading && ordersList.length === 0}}" class="empty-state">
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">{{currentTab === 'pending' ? '暂无待处理订单' : '暂无已完成订单'}}</text>
+  </view>
+
+  <view wx:elif="{{!loading}}" class="order-list">
+    <view wx:for="{{ordersList}}" wx:key="_id" class="order-card card">
+      <view class="order-top">
+        <view class="order-info">
+          <text class="order-name">{{item.recipeName}}</text>
+          <text class="order-time">{{item.createDateFormat}}</text>
         </view>
-        <view 
-          class="order-btn complete" 
-          bindtap="completeOrder" 
-          data-id="{{item._id}}">
-          完成
+        <view wx:if="{{currentTab === 'pending'}}" class="order-ops">
+          <text class="op-complete" data-id="{{item._id}}" bindtap="completeOrder">✓</text>
+          <text class="op-delete" data-id="{{item._id}}" data-name="{{item.recipeName}}" bindtap="deleteOrder">✕</text>
         </view>
       </view>
-      <view class="order-status completed" wx:else>
-        ✓
-      </view>
-    </view>
-
-    <view class="empty-tip" wx:if="{{ordersList.length === 0 && !loading}}">
-      <text>暂无{{currentTab === 'pending' ? '待制作' : '已完成'}}的菜品</text>
-    </view>
-  </view>
-
-  <view class="loading" wx:if="{{loading}}">
-    <text>加载中...</text>
-  </view>
-
-  <view class="shopping-suggestion" wx:if="{{shoppingList.length > 0}}">
-    <view class="suggestion-title">📝 采购建议</view>
-    <view class="suggestion-list">
-      <view 
-        class="suggestion-item" 
-        wx:for="{{shoppingList}}" 
-        wx:key="name">
-        <view class="suggestion-left">
-          <text class="suggestion-name">{{item.name}}</text>
-          <text class="suggestion-current">(库存: {{item.currentQuantity || 0}}{{item.unit}})</text>
-        </view>
-        <text class="suggestion-quantity">需采购: {{item.needQuantity}}{{item.unit}}</text>
+      <view wx:if="{{item.ingredients && item.ingredients.length > 0}}" class="order-ingredients">
+        <text wx:for="{{item.ingredients}}" wx:key="ingredientName" wx:for-item="ing" class="order-ing-tag">
+          {{ing.ingredientName}} {{ing.quantity}}{{ing.unit}}
+        </text>
       </view>
     </view>
   </view>
+
+  <view wx:else class="loading-container"><text>加载中...</text></view>
 </view>

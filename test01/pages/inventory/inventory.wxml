@@ -1,164 +1,119 @@
 <view class="container">
-  <view class="inventory-header">
-    <view class="header-left">
-      <view class="inventory-title">📦 食材库存</view>
-      <view class="inventory-tip">当前家庭食材储备</view>
-    </view>
-    <view class="header-right">
-      <view class="ocr-btn" bindtap="chooseImage">
-        📷 识小票
-      </view>
-      <view class="logs-btn" bindtap="goToLogs">
-        📋 流水
-      </view>
+  <!-- 库存预警 -->
+  <view wx:if="{{lowStockAlerts.length > 0}}" class="alert-strip">
+    <text class="alert-strip-icon">⚠️</text>
+    <text class="alert-strip-text">{{lowStockAlerts.length}} 种食材库存偏低</text>
+  </view>
+
+  <!-- 库存列表 -->
+  <view wx:if="{{!loading && inventoryList.length === 0}}" class="empty-state">
+    <text class="empty-icon">🧺</text>
+    <text class="empty-text">库存空空如也</text>
+    <text class="empty-sub">拍照识别小票或手动添加</text>
+    <view class="btn-row mt-lg">
+      <button class="btn btn-primary" bindtap="showAddModal">手动添加</button>
+      <button class="btn btn-secondary" bindtap="chooseImage">📷 拍照识别</button>
     </view>
   </view>
 
-  <view class="inventory-list">
+  <view wx:elif="{{!loading}}" class="inventory-list">
     <view 
-      class="inventory-item" 
       wx:for="{{inventoryList}}" 
-      wx:key="_id">
-      <view class="inventory-info">
-        <view class="inventory-name">{{item.name}}</view>
-        <view class="inventory-category">{{item.categoryText || '🥕 食材'}}</view>
+      wx:key="_id" 
+      class="inventory-card card {{item.isLow ? 'card--low' : ''}}"
+    >
+      <view class="inv-left">
+        <text class="inv-name">{{item.name}}</text>
+        <view class="inv-meta">
+          <text class="tag tag--primary">{{item.categoryText}}</text>
+          <text class="inv-unit">单位: {{item.unit}}</text>
+        </view>
       </view>
-      <view class="inventory-quantity">
-        <text class="quantity-value">{{item.quantity}}</text>
-        <text class="quantity-unit">{{item.unit || 'g'}}</text>
-      </view>
-      <view class="item-actions">
-        <view class="action-btn add" bindtap="showAddModal" data-item="{{item}}">+</view>
-        <view class="action-btn waste" bindtap="showWasteModal" data-item="{{item}}">报</view>
+      <view class="inv-right">
+        <text class="inv-qty {{item.isLow ? 'qty--low' : ''}}">{{item.quantity}}</text>
+        <view class="inv-actions">
+          <text class="inv-action-btn" bindtap="showAddModal" data-item="{{item}}">＋</text>
+          <text class="inv-action-btn inv-action-del" bindtap="showWasteModal" data-item="{{item}}">🗑</text>
+        </view>
       </view>
     </view>
-
-    <view class="empty-tip" wx:if="{{inventoryList.length === 0 && !loading}}">
-      <text>暂无库存记录</text>
-      <text class="empty-subtip">点击下方按钮添加食材</text>
-    </view>
   </view>
 
-  <view class="loading" wx:if="{{loading}}">
-    <text>加载中...</text>
+  <view wx:else class="loading-container"><text>加载中...</text></view>
+
+  <!-- 底部工具栏 -->
+  <view class="bottom-toolbar">
+    <button class="btn btn-primary btn-sm" bindtap="showAddModal">手动入库</button>
+    <button class="btn btn-secondary btn-sm" bindtap="chooseImage">📷 小票识别</button>
+    <button class="btn btn-secondary btn-sm" bindtap="goToLogs">📊 记录</button>
   </view>
 
-  <view class="add-inventory-btn" bindtap="showAddModal">
-    <text>+ 添加食材</text>
-  </view>
-
-  <view class="modal-overlay" wx:if="{{showModal}}" bindtap="hideModal"></view>
-  <view class="modal-content" wx:if="{{showModal}}">
-    <view class="modal-title">{{modalType === 'add' ? '➕ 添加库存' : '➕ 增加库存'}}</view>
-    <view class="modal-form">
-      <view class="form-item">
-        <text class="form-label">食材名称</text>
-        <input 
-          class="form-input" 
-          placeholder="请输入食材名称" 
-          bindinput="onNameInput"
-          value="{{newInventory.name}}"
-          disabled="{{modalType === 'increase'}}"
-        />
+  <!-- 入库弹窗 -->
+  <view wx:if="{{showModal}}" class="modal-mask" bindtap="hideModal">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">{{modalType === 'add' ? '新增食材' : '补充库存'}}</text>
+        <text class="modal-close" bindtap="hideModal">✕</text>
       </view>
-      <view class="form-item">
-        <text class="form-label">数量</text>
-        <input 
-          class="form-input" 
-          type="digit"
-          placeholder="请输入数量" 
-          bindinput="onQuantityInput"
-          value="{{newInventory.quantity}}"
-        />
+      <view wx:if="{{modalType === 'add'}}" class="input-group">
+        <text class="input-label">食材名称</text>
+        <input class="input-field" value="{{newInventory.name}}" bindinput="onNameInput" placeholder="例如: 猪肉" />
       </view>
-      <view class="form-item">
-        <text class="form-label">单位</text>
-        <picker bindchange="onUnitChange" value="{{unitIndex}}" range="{{units}}">
-          <view class="picker-value">
-            {{units[unitIndex]}}
-          </view>
+      <view wx:else class="input-group">
+        <text class="input-label">食材: {{newInventory.name}}</text>
+      </view>
+      <view class="input-group">
+        <text class="input-label">数量</text>
+        <input class="input-field" type="digit" value="{{newInventory.quantity}}" bindinput="onQuantityInput" placeholder="输入数量" />
+      </view>
+      <view class="input-group">
+        <text class="input-label">单位</text>
+        <picker mode="selector" range="{{units}}" value="{{unitIndex}}" bindchange="onUnitChange">
+          <view class="input-field">{{units[unitIndex]}}</view>
         </picker>
       </view>
-    </view>
-    <view class="modal-actions">
-      <view class="modal-btn cancel" bindtap="hideModal">取消</view>
-      <view class="modal-btn confirm" bindtap="submitInventory">确定</view>
-    </view>
-  </view>
-
-  <view class="modal-overlay" wx:if="{{showWasteModal}}" bindtap="closeWasteModal"></view>
-  <view class="modal-content" wx:if="{{showWasteModal}}">
-    <view class="modal-title">🗑️ 报废食材</view>
-    <view class="modal-form">
-      <view class="form-item">
-        <text class="form-label">食材名称</text>
-        <view class="form-value">{{wasteItem.name}}</view>
-      </view>
-      <view class="form-item">
-        <text class="form-label">当前库存</text>
-        <view class="form-value">{{wasteItem.quantity}}{{wasteItem.unit}}</view>
-      </view>
-      <view class="form-item">
-        <text class="form-label">报废数量</text>
-        <input 
-          class="form-input" 
-          type="digit"
-          placeholder="请输入报废数量" 
-          bindinput="onWasteQuantityInput"
-          value="{{wasteQuantity}}"
-        />
-      </view>
-      <view class="form-item">
-        <text class="form-label">报废原因</text>
-        <input 
-          class="form-input" 
-          placeholder="如：过期、变质等" 
-          bindinput="onWasteReasonInput"
-          value="{{wasteReason}}"
-        />
-      </view>
-    </view>
-    <view class="modal-actions">
-      <view class="modal-btn cancel" bindtap="closeWasteModal">取消</view>
-      <view class="modal-btn confirm waste" bindtap="submitWaste">确认报废</view>
+      <button class="btn btn-primary btn-block mt-md" bindtap="submitInventory" disabled="{{submitting}}">
+        {{submitting ? '保存中...' : '确认入库'}}
+      </button>
     </view>
   </view>
 
-  <view class="modal-overlay" wx:if="{{showOcrModal}}" bindtap="closeOcrModal"></view>
-  <view class="modal-content ocr-modal" wx:if="{{showOcrModal}}">
-    <view class="modal-title">📷 OCR 识别结果</view>
-    <view class="ocr-tip">请确认识别结果，可编辑</view>
-    
-    <view class="ocr-result-list">
-      <view 
-        class="ocr-item" 
-        wx:for="{{ocrResults}}" 
-        wx:key="index">
-        <input 
-          class="ocr-input name-input" 
-          value="{{item.name}}" 
-          data-index="{{index}}"
-          data-field="name"
-          bindinput="onOcrInput"
-          placeholder="食材名称"
-        />
-        <input 
-          class="ocr-input quantity-input" 
-          type="digit"
-          value="{{item.quantity}}" 
-          data-index="{{index}}"
-          data-field="quantity"
-          bindinput="onOcrInput"
-          placeholder="数量"
-        />
-        <view class="ocr-delete" bindtap="deleteOcrItem" data-index="{{index}}">×</view>
+  <!-- 报废弹窗 -->
+  <view wx:if="{{showWasteModal}}" class="modal-mask" bindtap="closeWasteModal">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">报废 - {{wasteItem.name}}</text>
+        <text class="modal-close" bindtap="closeWasteModal">✕</text>
       </view>
+      <text class="input-label">当前库存: {{wasteItem.quantity}}{{wasteItem.unit}}</text>
+      <view class="input-group mt-md">
+        <text class="input-label">报废数量</text>
+        <input class="input-field" type="digit" value="{{wasteQuantity}}" bindinput="onWasteQuantityInput" placeholder="输入报废数量" />
+      </view>
+      <view class="input-group">
+        <text class="input-label">报废原因</text>
+        <input class="input-field" value="{{wasteReason}}" bindinput="onWasteReasonInput" placeholder="过期 / 变质 / 其他" />
+      </view>
+      <button class="btn btn-danger btn-block mt-md" bindtap="submitWaste">确认报废</button>
     </view>
-    
-    <view class="modal-actions">
-      <view class="modal-btn cancel" bindtap="closeOcrModal">取消</view>
-      <view class="modal-btn add-more" bindtap="addOcrItem">+ 添加</view>
-      <view class="modal-btn confirm" bindtap="submitOcrResults">确认入库</view>
+  </view>
+
+  <!-- OCR 结果弹窗 -->
+  <view wx:if="{{showOcrModal}}" class="modal-mask" bindtap="closeOcrModal">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">识别结果</text>
+        <text class="modal-close" bindtap="closeOcrModal">✕</text>
+      </view>
+      <view wx:for="{{ocrResults}}" wx:key="index" class="ocr-item">
+        <input class="input-field" value="{{item.name}}" data-index="{{index}}" data-field="name" bindinput="onOcrInput" placeholder="食材名称" />
+        <input class="input-field" type="digit" value="{{item.quantity}}" data-index="{{index}}" data-field="quantity" bindinput="onOcrInput" placeholder="数量" />
+        <text class="ocr-del" data-index="{{index}}" bindtap="deleteOcrItem">✕</text>
+      </view>
+      <view class="btn-row">
+        <button class="btn btn-secondary" bindtap="addOcrItem">＋ 添加一行</button>
+        <button class="btn btn-primary" bindtap="submitOcrResults">确认入库</button>
+      </view>
     </view>
   </view>
 </view>

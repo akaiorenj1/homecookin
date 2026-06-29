@@ -1,30 +1,50 @@
+const authBehavior = require('../../utils/behavior');
+const auth = require('../../utils/auth');
+
 Page({
+  behaviors: [authBehavior],
+
   data: {
-    hasLogin: false
+    hasLogin: false,
+    todayMenu: [],
+    lowStockCount: 0,
+    pendingOrderCount: 0,
+    totalRecipes: 0
   },
 
   onShow() {
-    const isAuthorized = wx.getStorageSync('isAuthorized');
-    if (!isAuthorized) {
-      wx.showModal({
-        title: '提示',
-        content: '请先登录',
-        showCancel: false,
-        success: () => {
-          wx.navigateTo({ url: '/pages/login/login' });
-        }
-      });
+    const loggedIn = auth.isLoggedIn();
+    this.setData({ hasLogin: loggedIn });
+    
+    if (loggedIn) {
+      this.loadDashboard();
     }
-    this.setData({ hasLogin: !!isAuthorized });
   },
 
-  goToLogin() {
-    wx.navigateTo({ url: '/pages/login/login' });
+  async loadDashboard() {
+    const db = require('../../utils/db');
+    try {
+      const [recipes, inventory, orders] = await Promise.all([
+        db.find(db.recipes, { orderBy: 'createTime', limit: 3 }),
+        db.find(db.inventory, { orderBy: 'name' }),
+        db.find(db.orders, { where: { status: 'pending' } })
+      ]);
+
+      const lowStock = inventory.filter(item => item.quantity <= 100);
+      
+      this.setData({
+        todayMenu: recipes,
+        lowStockCount: lowStock.length,
+        pendingOrderCount: orders.length,
+        totalRecipes: recipes.length
+      });
+    } catch (err) {
+      console.error('加载首页数据失败:', err);
+    }
   },
 
   goToMenu() {
-    const isAuthorized = wx.getStorageSync('isAuthorized');
-    if (!isAuthorized) {
+    if (!auth.isLoggedIn()) {
       wx.navigateTo({ url: '/pages/login/login' });
       return;
     }
@@ -32,8 +52,7 @@ Page({
   },
 
   goToInventory() {
-    const isAuthorized = wx.getStorageSync('isAuthorized');
-    if (!isAuthorized) {
+    if (!auth.isLoggedIn()) {
       wx.navigateTo({ url: '/pages/login/login' });
       return;
     }
@@ -41,29 +60,26 @@ Page({
   },
 
   goToOrders() {
-    const isAuthorized = wx.getStorageSync('isAuthorized');
-    if (!isAuthorized) {
+    if (!auth.isLoggedIn()) {
       wx.navigateTo({ url: '/pages/login/login' });
       return;
     }
     wx.switchTab({ url: '/pages/orders/orders' });
   },
 
-  goToAdmin() {
-    const isAuthorized = wx.getStorageSync('isAuthorized');
-    if (!isAuthorized) {
-      wx.navigateTo({ url: '/pages/login/login' });
-      return;
-    }
-    wx.navigateTo({ url: '/pages/admin/recipe-edit/recipe-edit' });
-  },
-
   goToRecipeManage() {
-    const isAuthorized = wx.getStorageSync('isAuthorized');
-    if (!isAuthorized) {
+    if (!auth.isLoggedIn()) {
       wx.navigateTo({ url: '/pages/login/login' });
       return;
     }
     wx.navigateTo({ url: '/pages/admin/recipe-manage/recipe-manage' });
+  },
+
+  goToInventoryLogs() {
+    if (!auth.isLoggedIn()) {
+      wx.navigateTo({ url: '/pages/login/login' });
+      return;
+    }
+    wx.navigateTo({ url: '/pages/inventory-logs/inventory-logs' });
   }
 });

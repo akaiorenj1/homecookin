@@ -1,33 +1,69 @@
 <view class="container">
-  <view class="welcome-card">
-    <view class="welcome-title">🏠 家常厨房</view>
-    <view class="welcome-subtitle">今天吃什么！</view>
+  <!-- 未登录 -->
+  <view wx:if="{{!hasLogin}}" class="empty-state">
+    <text class="empty-icon">🍳</text>
+    <text class="empty-text">欢迎使用家常厨房</text>
+    <button class="btn btn-primary mt-lg" bindtap="goToMenu">开始使用</button>
   </view>
-  
-  <view class="nav-grid">
-    <view class="nav-item" bindtap="goToMenu">
-      <view class="nav-icon">🥘</view>
-      <view class="nav-text">开始点菜</view>
+
+  <!-- 已登录 - 仪表盘 -->
+  <view wx:else>
+    <view class="header">
+      <text class="greeting">👋 早上好</text>
+      <text class="date-sub">今天想吃点什么？</text>
     </view>
-    <view class="nav-item" bindtap="goToInventory">
-      <view class="nav-icon">📦</view>
-      <view class="nav-text">食材库存</view>
+
+    <!-- 快捷入口 -->
+    <view class="quick-actions">
+      <view class="quick-card" bindtap="goToMenu">
+        <text class="quick-icon">📖</text>
+        <text class="quick-label">菜谱</text>
+        <text class="quick-badge">{{totalRecipes}}</text>
+      </view>
+      <view class="quick-card" bindtap="goToInventory">
+        <text class="quick-icon">🧺</text>
+        <text class="quick-label">库存</text>
+        <text wx:if="{{lowStockCount > 0}}" class="quick-badge badge-warning">{{lowStockCount}}</text>
+      </view>
+      <view class="quick-card" bindtap="goToOrders">
+        <text class="quick-icon">📋</text>
+        <text class="quick-label">订单</text>
+        <text wx:if="{{pendingOrderCount > 0}}" class="quick-badge">{{pendingOrderCount}}</text>
+      </view>
+      <view class="quick-card" bindtap="goToInventoryLogs">
+        <text class="quick-icon">📊</text>
+        <text class="quick-label">记录</text>
+      </view>
     </view>
-    <view class="nav-item" bindtap="goToOrders">
-      <view class="nav-icon">📋</view>
-      <view class="nav-text">我的订单</view>
+
+    <!-- 今日推荐 -->
+    <view wx:if="{{todayMenu.length > 0}}" class="section">
+      <text class="section-title">今日推荐</text>
+      <scroll-view scroll-x class="recipe-scroll">
+        <view wx:for="{{todayMenu}}" wx:key="_id" class="recipe-card-sm" bindtap="goToMenu">
+          <image wx:if="{{item.image}}" src="{{item.image}}" class="recipe-img-sm" mode="aspectFill" />
+          <text wx:else class="recipe-img-placeholder">🍽️</text>
+          <text class="recipe-name-sm">{{item.name}}</text>
+        </view>
+      </scroll-view>
     </view>
-    <view class="nav-item" bindtap="goToRecipeManage">
-      <view class="nav-icon">⚙️</view>
-      <view class="nav-text">菜品管理</view>
+
+    <!-- 低库存提醒 -->
+    <view wx:if="{{lowStockCount > 0}}" class="alert-card" bindtap="goToInventory">
+      <text class="alert-icon">⚠️</text>
+      <view class="alert-content">
+        <text class="alert-title">库存预警</text>
+        <text class="alert-desc">{{lowStockCount}} 种食材库存不足</text>
+      </view>
+      <text class="alert-arrow">→</text>
     </view>
-  </view>
-  
-  <view class="login-section" wx:if="{{!hasLogin}}">
-    <button class="login-btn" bindtap="goToLogin">🔐 授权登录</button>
-  </view>
-  
-  <view class="login-section" wx:else>
-    <button class="logout-btn" bindtap="goToLogin">🔐 已登录（切换账号）</button>
+
+    <!-- 管理入口 -->
+    <view class="admin-section">
+      <view class="admin-link" bindtap="goToRecipeManage">
+        <text>📝 管理菜谱</text>
+        <text class="link-arrow">→</text>
+      </view>
+    </view>
   </view>
 </view>

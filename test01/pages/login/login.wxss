@@ -1,74 +1,84 @@
-.container {
+.login-container {
   min-height: 100vh;
-  background: linear-gradient(180deg, #6b8e23 0%, #556b2f 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   padding: 40rpx;
 }
 
 .login-card {
   width: 100%;
-  background-color: #fff8dc;
-  border-radius: 20rpx;
-  padding: 50rpx 30rpx;
-  text-align: center;
-  border: 4rpx solid #8b4513;
-  box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, 0.3);
+  max-width: 600rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 80rpx 60rpx 60rpx;
+  box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.15);
+}
+
+.logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 80rpx;
+}
+
+.logo-icon {
+  font-size: 120rpx;
+  margin-bottom: 20rpx;
 }
 
 .app-name {
-  font-size: 40rpx;
-  font-weight: bold;
-  color: #5c4033;
-  margin-bottom: 8rpx;
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 12rpx;
 }
 
 .app-desc {
-  font-size: 24rpx;
-  color: #8b4513;
-  margin-bottom: 40rpx;
+  font-size: 26rpx;
+  color: #999;
 }
 
-.input-group {
-  margin-bottom: 24rpx;
-}
-
-.password-input {
+.primary-btn {
   width: 100%;
-  height: 72rpx;
-  background-color: #fffaf0;
-  border: 3rpx solid #8b4513;
-  border-radius: 10rpx;
-  padding: 0 20rpx;
-  font-size: 28rpx;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-.error-tip {
-  color: #cd5c5c;
-  font-size: 22rpx;
-  margin-bottom: 16rpx;
-}
-
-.login-btn {
-  background: linear-gradient(180deg, #6b8e23 0%, #556b2f 100%);
-  color: #fff8dc;
-  font-size: 28rpx;
-  font-weight: bold;
-  padding: 18rpx 50rpx;
-  border-radius: 10rpx;
-  border: 3rpx solid #3d4a1d;
-  box-shadow: 3rpx 3rpx 0 #3d4a1d;
-}
-
-.login-btn::after {
+  height: 96rpx;
+  line-height: 96rpx;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+  border-radius: 48rpx;
   border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.tips {
+.primary-btn[disabled] {
+  opacity: 0.7;
+}
+
+.alt-login {
+  margin-top: 40rpx;
+  text-align: center;
+}
+
+.alt-text {
+  font-size: 26rpx;
+  color: #ff6b35;
+  text-decoration: underline;
+}
+
+.error-msg {
   margin-top: 30rpx;
-  font-size: 20rpx;
-  color: #a0522d;
+  padding: 20rpx;
+  background: #fff2f0;
+  border-radius: 12rpx;
+  text-align: center;
+}
+
+.error-msg text {
+  font-size: 26rpx;
+  color: #ff4d4f;
 }
