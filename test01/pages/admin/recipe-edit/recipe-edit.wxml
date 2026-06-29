@@ -1,0 +1,135 @@
+<view class="container">
+  <view class="header">
+    <view class="title">{{isEdit ? '编辑菜品' : '添加菜品'}}</view>
+  </view>
+
+  <view class="form">
+    <view class="form-item">
+      <text class="form-label">菜品名称</text>
+      <input 
+        class="form-input" 
+        placeholder="请输入菜品名称" 
+        bindinput="onNameInput"
+        value="{{recipe.name}}"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">分类</text>
+      <picker bindchange="onCategoryChange" value="{{categoryIndex}}" range="{{categories}}">
+        <view class="picker-value">
+          {{categories[categoryIndex]}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">制作时间（分钟）</text>
+      <input 
+        class="form-input" 
+        type="number"
+        placeholder="请输入制作时间" 
+        bindinput="onTimeInput"
+        value="{{recipe.cookingTime}}"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">菜品图片</text>
+      <view class="image-upload" bindtap="chooseImage">
+        <image 
+          wx:if="{{recipe.image}}" 
+          class="preview-image" 
+          src="{{recipe.image}}" 
+          mode="aspectFill"
+        ></image>
+        <view wx:else class="upload-placeholder">
+          <text class="upload-icon">+</text>
+          <text class="upload-text">点击选择图片</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">制作方法</text>
+      <textarea 
+        class="form-textarea" 
+        placeholder="请输入制作方法" 
+        bindinput="onMethodInput"
+        value="{{recipe.method}}"
+      />
+    </view>
+
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">所需食材</text>
+        <view class="add-ingredient-btn" bindtap="showIngredientModal">
+          <text>+ 添加食材</text>
+        </view>
+      </view>
+
+      <view class="ingredient-list" wx:if="{{recipe.ingredients && recipe.ingredients.length > 0}}">
+        <view 
+          class="ingredient-item" 
+          wx:for="{{recipe.ingredients}}" 
+          wx:key="index">
+          <view class="ingredient-info">
+            <text class="ingredient-name">{{item.ingredientName}}</text>
+            <text class="ingredient-quantity">{{item.quantity}}{{item.unit}}</text>
+          </view>
+          <view 
+            class="delete-btn" 
+            bindtap="deleteIngredient" 
+            data-index="{{index}}">
+            删除
+          </view>
+        </view>
+      </view>
+      <view class="empty-tip" wx:else>
+        <text>暂无食材，请添加</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="actions">
+    <view class="btn cancel" bindtap="goBack">取消</view>
+    <view class="btn confirm" bindtap="submitRecipe">{{isEdit ? '保存' : '添加'}}</view>
+  </view>
+
+  <view class="ingredient-modal" wx:if="{{showIngredientModal}}">
+    <view class="modal-content">
+      <view class="modal-title">添加食材</view>
+      <view class="form-item">
+        <text class="form-label">食材名称</text>
+        <input 
+          class="form-input" 
+          placeholder="请输入食材名称" 
+          bindinput="onIngNameInput"
+          value="{{newIngredient.name}}"
+        />
+      </view>
+      <view class="form-item">
+        <text class="form-label">数量</text>
+        <input 
+          class="form-input" 
+          type="digit"
+          placeholder="请输入数量" 
+          bindinput="onIngQuantityInput"
+          value="{{newIngredient.quantity}}"
+        />
+      </view>
+      <view class="form-item">
+        <text class="form-label">单位</text>
+        <picker bindchange="onIngUnitChange" value="{{ingUnitIndex}}" range="{{units}}">
+          <view class="picker-value">
+            {{units[ingUnitIndex]}}
+          </view>
+        </picker>
+      </view>
+      <view class="modal-actions">
+        <view class="modal-btn cancel" bindtap="hideIngredientModal">取消</view>
+        <view class="modal-btn confirm" bindtap="addIngredient">确定</view>
+      </view>
+    </view>
+  </view>
+</view>

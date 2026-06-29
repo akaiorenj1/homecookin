@@ -1,0 +1,88 @@
+<view class="container">
+  <view class="header">
+    <view class="title">📋 库存流水</view>
+    <view class="subtitle">查看库存变化记录</view>
+  </view>
+
+  <view class="search-bar">
+    <input 
+      class="search-input" 
+      placeholder="🔍 搜索食材..." 
+      bindinput="onSearchInput"
+      value="{{searchKeyword}}"
+    />
+  </view>
+
+  <view class="date-filter">
+    <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+      <view class="date-picker {{startDate ? '' : 'placeholder'}}">
+        {{startDate || '📅 开始日期'}}
+      </view>
+    </picker>
+    <text class="date-separator">至</text>
+    <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+      <view class="date-picker {{endDate ? '' : 'placeholder'}}">
+        {{endDate || '📅 结束日期'}}
+      </view>
+    </picker>
+    <view class="clear-date" bindtap="clearDateFilter" wx:if="{{startDate || endDate}}">
+      ✖ 清除
+    </view>
+  </view>
+
+  <view class="tabs">
+    <view 
+      class="tab-item {{currentTab === 'all' ? 'active' : ''}}" 
+      bindtap="switchTab" 
+      data-tab="all">
+      📋 全部
+    </view>
+    <view 
+      class="tab-item {{currentTab === 'in' ? 'active' : ''}}" 
+      bindtap="switchTab" 
+      data-tab="in">
+      📥 入库
+    </view>
+    <view 
+      class="tab-item {{currentTab === 'out' ? 'active' : ''}}" 
+      bindtap="switchTab" 
+      data-tab="out">
+      📤 出库
+    </view>
+    <view 
+      class="tab-item {{currentTab === 'waste' ? 'active' : ''}}" 
+      bindtap="switchTab" 
+      data-tab="waste">
+      🗑️ 报废
+    </view>
+  </view>
+
+  <view class="logs-list">
+    <view 
+      class="log-item" 
+      wx:for="{{filteredList}}" 
+      wx:key="_id">
+      <view class="log-info">
+        <view class="log-name">{{item.ingredientName}}</view>
+        <view class="log-desc">{{item.description}}</view>
+        <view class="log-time">{{item.createTimeFormat}}</view>
+      </view>
+      <view class="log-right">
+        <view class="log-quantity {{item.type}}">
+          <text wx:if="{{item.type === 'in'}}">+{{item.quantity}}{{item.unit}}</text>
+          <text wx:elif="{{item.type === 'out'}}">-{{item.quantity}}{{item.unit}}</text>
+          <text wx:else>-{{item.quantity}}{{item.unit}}(废)</text>
+        </view>
+        <view class="log-balance">余额: {{item.balance}}{{item.unit}}</view>
+      </view>
+    </view>
+
+    <view class="empty-tip" wx:if="{{filteredList.length === 0 && !loading}}">
+      <text>暂无记录</text>
+    </view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+</view>

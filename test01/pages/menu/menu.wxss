@@ -1,0 +1,126 @@
+.category-tabs {
+  display: flex;
+  background-color: #fff8dc;
+  padding: 16rpx 0;
+  margin-bottom: 20rpx;
+  border-radius: 12rpx;
+  border: 3rpx solid #8b4513;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  font-size: 24rpx;
+  color: #8b4513;
+  position: relative;
+  padding: 12rpx 0;
+  font-weight: bold;
+}
+
+.tab-item.active {
+  color: #fff8dc;
+  background-color: #6b8e23;
+}
+
+.menu-list {
+  padding-bottom: 120rpx;
+}
+
+.menu-item {
+  display: flex;
+  background-color: #fff8dc;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+  padding: 20rpx;
+  border: 3rpx solid #8b4513;
+  box-shadow: 4rpx 4rpx 0 rgba(139, 69, 19, 0.2);
+}
+
+.menu-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 8rpx;
+  background-color: #f5deb3;
+  border: 2rpx solid #8b4513;
+}
+
+.menu-info {
+  flex: 1;
+  margin-left: 16rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.menu-name {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #5c4033;
+}
+
+.menu-time {
+  font-size: 22rpx;
+  color: #a0522d;
+  margin-top: 6rpx;
+}
+
+.menu-tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 8rpx;
+}
+
+.tag {
+  font-size: 20rpx;
+  color: #fff8dc;
+  background-color: #6b8e23;
+  padding: 4rpx 10rpx;
+  border-radius: 4rpx;
+  margin-right: 8rpx;
+  border: 1rpx solid #3d4a1d;
+}
+
+.menu-order-btn {
+  align-self: center;
+  background-color: #cd853f;
+  color: #fff8dc;
+  font-size: 22rpx;
+  font-weight: bold;
+  padding: 12rpx 20rpx;
+  border-radius: 8rpx;
+  border: 2rpx solid #8b4513;
+}
+
+.empty-tip {
+  text-align: center;
+  color: #a0522d;
+  padding: 60rpx 0;
+  font-size: 26rpx;
+}
+
+.loading {
+  text-align: center;
+  padding: 30rpx;
+  color: #a0522d;
+}
+
+.add-btn {
+  position: fixed;
+  right: 40rpx;
+  bottom: 40rpx;
+  width: 96rpx;
+  height: 96rpx;
+  background-color: #cd853f;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4rpx solid #8b4513;
+  box-shadow: 4rpx 4rpx 0 #8b4513;
+}
+
+.add-btn text {
+  font-size: 56rpx;
+  color: #fff8dc;
+  font-weight: bold;
+}

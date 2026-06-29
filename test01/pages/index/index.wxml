@@ -1,0 +1,33 @@
+<view class="container">
+  <view class="welcome-card">
+    <view class="welcome-title">🏠 家常厨房</view>
+    <view class="welcome-subtitle">今天吃什么！</view>
+  </view>
+  
+  <view class="nav-grid">
+    <view class="nav-item" bindtap="goToMenu">
+      <view class="nav-icon">🥘</view>
+      <view class="nav-text">开始点菜</view>
+    </view>
+    <view class="nav-item" bindtap="goToInventory">
+      <view class="nav-icon">📦</view>
+      <view class="nav-text">食材库存</view>
+    </view>
+    <view class="nav-item" bindtap="goToOrders">
+      <view class="nav-icon">📋</view>
+      <view class="nav-text">我的订单</view>
+    </view>
+    <view class="nav-item" bindtap="goToRecipeManage">
+      <view class="nav-icon">⚙️</view>
+      <view class="nav-text">菜品管理</view>
+    </view>
+  </view>
+  
+  <view class="login-section" wx:if="{{!hasLogin}}">
+    <button class="login-btn" bindtap="goToLogin">🔐 授权登录</button>
+  </view>
+  
+  <view class="login-section" wx:else>
+    <button class="logout-btn" bindtap="goToLogin">🔐 已登录（切换账号）</button>
+  </view>
+</view>

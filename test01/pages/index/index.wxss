@@ -1,0 +1,78 @@
+.welcome-card {
+  background: linear-gradient(180deg, #6b8e23 0%, #556b2f 100%);
+  border-radius: 16rpx;
+  padding: 50rpx 30rpx;
+  text-align: center;
+  margin-bottom: 30rpx;
+  border: 4rpx solid #3d4a1d;
+  box-shadow: 6rpx 6rpx 0 #3d4a1d;
+}
+
+.welcome-title {
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #fff8dc;
+  text-shadow: 2rpx 2rpx 0 #3d4a1d;
+}
+
+.welcome-subtitle {
+  font-size: 32rpx;
+  color: #f5deb3;
+  margin-top: 10rpx;
+  text-shadow: 1rpx 1rpx 0 #3d4a1d;
+}
+
+.nav-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20rpx;
+}
+
+.nav-item {
+  width: 44%;
+  background-color: #fff8dc;
+  border-radius: 12rpx;
+  padding: 40rpx 20rpx;
+  text-align: center;
+  margin-bottom: 20rpx;
+  border: 3rpx solid #8b4513;
+  box-shadow: 4rpx 4rpx 0 rgba(139, 69, 19, 0.3);
+}
+
+.nav-item:active {
+  transform: translate(2rpx, 2rpx);
+  box-shadow: 2rpx 2rpx 0 rgba(139, 69, 19, 0.3);
+}
+
+.nav-icon {
+  font-size: 64rpx;
+  margin-bottom: 16rpx;
+}
+
+.nav-text {
+  font-size: 28rpx;
+  color: #6b8e23;
+  font-weight: bold;
+}
+
+.login-section {
+  margin-top: 40rpx;
+  text-align: center;
+}
+
+.login-btn {
+  background-color: #cd853f;
+  color: #fff8dc;
+  font-size: 28rpx;
+  font-weight: bold;
+  padding: 20rpx 60rpx;
+  border-radius: 12rpx;
+  border: 4rpx solid #8b4513;
+  box-shadow: 4rpx 4rpx 0 #8b4513;
+}
+
+.login-btn:active {
+  transform: translate(2rpx, 2rpx);
+  box-shadow: 2rpx 2rpx 0 #8b4513;
+}

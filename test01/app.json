@@ -1,0 +1,42 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/login/login",
+    "pages/menu/menu",
+    "pages/menu-detail/menu-detail",
+    "pages/inventory/inventory",
+    "pages/inventory-logs/inventory-logs",
+    "pages/orders/orders",
+    "pages/admin/recipe-edit/recipe-edit",
+    "pages/admin/recipe-manage/recipe-manage",
+    "pages/admin/ingredient-edit/ingredient-edit"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#6b8e23",
+    "navigationBarTitleText": "家常厨房",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#8b4513",
+    "selectedColor": "#6b8e23",
+    "backgroundColor": "#fff8dc",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/menu/menu",
+        "text": "点菜"
+      },
+      {
+        "pagePath": "pages/inventory/inventory",
+        "text": "库存"
+      },
+      {
+        "pagePath": "pages/orders/orders",
+        "text": "订单"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

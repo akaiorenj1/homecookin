@@ -1,0 +1,81 @@
+<view class="container">
+  <view class="orders-header">
+    <view class="orders-title">🍽️ 今日点菜</view>
+    <view class="orders-date">{{today}}</view>
+  </view>
+
+  <view class="tabs">
+    <view 
+      class="tab-item {{currentTab === 'pending' ? 'active' : ''}}" 
+      bindtap="switchTab" 
+      data-tab="pending">
+      ⏳ 待制作
+    </view>
+    <view 
+      class="tab-item {{currentTab === 'completed' ? 'active' : ''}}" 
+      bindtap="switchTab" 
+      data-tab="completed">
+      ✅ 已完成
+    </view>
+  </view>
+
+  <view class="orders-list">
+    <view 
+      class="order-item" 
+      wx:for="{{ordersList}}" 
+      wx:key="_id">
+      <image 
+        class="order-image" 
+        src="{{item.recipeImage || '/images/default-food.png'}}" 
+        mode="aspectFill">
+      </image>
+      <view class="order-info">
+        <view class="order-name">{{item.recipeName}}</view>
+        <view class="order-time" wx:if="{{currentTab === 'pending'}}">{{item.createTimeFormat}}</view>
+        <view class="order-time" wx:else>{{item.createDateFormat}}</view>
+      </view>
+      <view class="order-actions" wx:if="{{currentTab === 'pending'}}">
+        <view 
+          class="order-btn delete" 
+          bindtap="deleteOrder" 
+          data-id="{{item._id}}"
+          data-name="{{item.recipeName}}">
+          删除
+        </view>
+        <view 
+          class="order-btn complete" 
+          bindtap="completeOrder" 
+          data-id="{{item._id}}">
+          完成
+        </view>
+      </view>
+      <view class="order-status completed" wx:else>
+        ✓
+      </view>
+    </view>
+
+    <view class="empty-tip" wx:if="{{ordersList.length === 0 && !loading}}">
+      <text>暂无{{currentTab === 'pending' ? '待制作' : '已完成'}}的菜品</text>
+    </view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="shopping-suggestion" wx:if="{{shoppingList.length > 0}}">
+    <view class="suggestion-title">📝 采购建议</view>
+    <view class="suggestion-list">
+      <view 
+        class="suggestion-item" 
+        wx:for="{{shoppingList}}" 
+        wx:key="name">
+        <view class="suggestion-left">
+          <text class="suggestion-name">{{item.name}}</text>
+          <text class="suggestion-current">(库存: {{item.currentQuantity || 0}}{{item.unit}})</text>
+        </view>
+        <text class="suggestion-quantity">需采购: {{item.needQuantity}}{{item.unit}}</text>
+      </view>
+    </view>
+  </view>
+</view>

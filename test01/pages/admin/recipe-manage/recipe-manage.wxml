@@ -1,0 +1,57 @@
+<view class="container">
+  <view class="page-title">🍽️ 菜品管理</view>
+
+  <view class="category-tabs">
+    <view 
+      class="tab-item {{currentCategory === 'main' ? 'active' : ''}}" 
+      bindtap="switchCategory" 
+      data-category="main">
+      🥘 菜品
+    </view>
+    <view 
+      class="tab-item {{currentCategory === 'drink' ? 'active' : ''}}" 
+      bindtap="switchCategory" 
+      data-category="drink">
+      ☕ 饮品
+    </view>
+    <view 
+      class="tab-item {{currentCategory === 'dessert' ? 'active' : ''}}" 
+      bindtap="switchCategory" 
+      data-category="dessert">
+      🍰 甜品
+    </view>
+  </view>
+
+  <view class="menu-list">
+    <view 
+      class="menu-item" 
+      wx:for="{{menuList}}" 
+      wx:key="_id">
+      <image 
+        class="menu-image" 
+        src="{{item.image || '/images/default-food.png'}}" 
+        mode="aspectFill">
+      </image>
+      <view class="menu-info">
+        <view class="menu-name">{{item.name}}</view>
+        <view class="menu-time">🕐 {{item.cookingTime}}分钟</view>
+      </view>
+      <view class="menu-actions">
+        <view class="action-btn edit" bindtap="editRecipe" data-id="{{item._id}}">编辑</view>
+        <view class="action-btn delete" bindtap="deleteRecipe" data-id="{{item._id}}" data-name="{{item.name}}">删除</view>
+      </view>
+    </view>
+
+    <view class="empty-tip" wx:if="{{menuList.length === 0 && !loading}}">
+      <text>暂无菜品</text>
+    </view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="add-btn" bindtap="goToAddRecipe">
+    <text>+</text>
+  </view>
+</view>

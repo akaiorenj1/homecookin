@@ -1,0 +1,108 @@
+<view class="container">
+  <view class="header">
+    <view class="title">食材库管理</view>
+    <view class="subtitle">维护常用食材列表</view>
+  </view>
+
+  <view class="search-bar">
+    <input 
+      class="search-input" 
+      placeholder="搜索食材" 
+      bindinput="onSearchInput"
+      value="{{searchKeyword}}"
+    />
+  </view>
+
+  <view class="category-filter">
+    <view 
+      class="filter-item {{currentCategory === '' ? 'active' : ''}}" 
+      bindtap="switchCategory" 
+      data-category="">
+      全部
+    </view>
+    <view 
+      class="filter-item {{currentCategory === 'vegetable' ? 'active' : ''}}" 
+      bindtap="switchCategory" 
+      data-category="vegetable">
+      蔬菜
+    </view>
+    <view 
+      class="filter-item {{currentCategory === 'meat' ? 'active' : ''}}" 
+      bindtap="switchCategory" 
+      data-category="meat">
+      肉类
+    </view>
+    <view 
+      class="filter-item {{currentCategory === 'seafood' ? 'active' : ''}}" 
+      bindtap="switchCategory" 
+      data-category="seafood">
+      海鲜
+    </view>
+    <view 
+      class="filter-item {{currentCategory === 'seasoning' ? 'active' : ''}}" 
+      bindtap="switchCategory" 
+      data-category="seasoning">
+      调料
+    </view>
+  </view>
+
+  <view class="ingredient-list">
+    <view 
+      class="ingredient-item" 
+      wx:for="{{filteredList}}" 
+      wx:key="_id">
+      <view class="ingredient-info">
+        <view class="ingredient-name">{{item.name}}</view>
+        <view class="ingredient-meta">{{item.unit}} · {{item.categoryText}}</view>
+      </view>
+      <view class="ingredient-actions">
+        <view class="action-btn edit" bindtap="editIngredient" data-item="{{item}}">编辑</view>
+        <view class="action-btn delete" bindtap="deleteIngredient" data-id="{{item._id}}">删除</view>
+      </view>
+    </view>
+
+    <view class="empty-tip" wx:if="{{filteredList.length === 0 && !loading}}">
+      <text>暂无食材</text>
+    </view>
+  </view>
+
+  <view class="add-btn" bindtap="showAddModal">
+    <text>+</text>
+  </view>
+
+  <view class="modal-overlay" wx:if="{{showModal}}" bindtap="hideModal"></view>
+  <view class="modal-content" wx:if="{{showModal}}">
+    <view class="modal-title">{{isEdit ? '编辑食材' : '添加食材'}}</view>
+    <view class="modal-form">
+      <view class="form-item">
+        <text class="form-label">食材名称</text>
+        <input 
+          class="form-input" 
+          placeholder="请输入食材名称" 
+          bindinput="onNameInput"
+          value="{{formData.name}}"
+        />
+      </view>
+      <view class="form-item">
+        <text class="form-label">单位</text>
+        <picker bindchange="onUnitChange" value="{{unitIndex}}" range="{{units}}">
+          <view class="picker-value">
+            {{units[unitIndex]}}
+          </view>
+        </picker>
+      </view>
+      <view class="form-item">
+        <text class="form-label">分类</text>
+        <picker bindchange="onCategoryChange" value="{{categoryIndex}}" range="{{categories}}">
+          <view class="picker-value">
+            {{categories[categoryIndex]}}
+          </view>
+        </picker>
+      </view>
+    </view>
+    <view class="modal-actions">
+      <view class="modal-btn cancel" bindtap="hideModal">取消</view>
+      <view class="modal-btn confirm" bindtap="submitIngredient">确定</view>
+    </view>
+  </view>
+</view>

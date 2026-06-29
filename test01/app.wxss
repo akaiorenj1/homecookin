@@ -1,0 +1,83 @@
+page {
+  background-color: #f4e4bc;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 26rpx;
+  color: #5c4033;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 4rpx,
+      rgba(139, 69, 19, 0.02) 4rpx,
+      rgba(139, 69, 19, 0.02) 8rpx
+    );
+  background-attachment: fixed;
+  box-sizing: border-box;
+}
+
+.container {
+  padding: 20rpx;
+}
+
+input, textarea, picker {
+  box-sizing: border-box;
+}
+
+.btn-primary {
+  background-color: #6b8e23;
+  color: #fff;
+  border-radius: 8rpx;
+  padding: 20rpx 40rpx;
+  text-align: center;
+  border: 4rpx solid #3d4a1d;
+  box-shadow: 4rpx 4rpx 0 #3d4a1d;
+}
+
+.btn-secondary {
+  background-color: #f5deb3;
+  color: #6b8e23;
+  border: 4rpx solid #6b8e23;
+  border-radius: 8rpx;
+  padding: 20rpx 40rpx;
+  text-align: center;
+}
+
+.card {
+  background-color: #fff8dc;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  border: 3rpx solid #8b4513;
+  box-shadow: 4rpx 4rpx 0 rgba(139, 69, 19, 0.3);
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  padding-left: 10rpx;
+  border-left: 8rpx solid #6b8e23;
+  color: #8b4513;
+}
+
+.input-field {
+  background-color: #fffaf0;
+  border: 3rpx solid #8b4513;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.input-label {
+  display: block;
+  color: #8b4513;
+  margin-bottom: 10rpx;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.input-value {
+  width: 100%;
+  font-size: 26rpx;
+  color: #5c4033;
+}

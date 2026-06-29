@@ -1,0 +1,218 @@
+.container {
+  padding: 30rpx;
+  padding-bottom: 120rpx;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.header {
+  margin-bottom: 30rpx;
+}
+
+.title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.subtitle {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+.search-bar {
+  margin-bottom: 20rpx;
+}
+
+.search-input {
+  width: 100%;
+  height: 72rpx;
+  background-color: #fff;
+  border-radius: 36rpx;
+  padding: 0 30rpx;
+  font-size: 28rpx;
+}
+
+.category-filter {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+  overflow-x: auto;
+  padding-bottom: 10rpx;
+}
+
+.filter-item {
+  flex-shrink: 0;
+  padding: 12rpx 24rpx;
+  background-color: #fff;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.filter-item.active {
+  background-color: #1890ff;
+  color: #fff;
+}
+
+.ingredient-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.ingredient-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+}
+
+.ingredient-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.ingredient-meta {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 4rpx;
+}
+
+.ingredient-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.action-btn {
+  font-size: 24rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 6rpx;
+}
+
+.action-btn.edit {
+  color: #1890ff;
+  background-color: rgba(24, 144, 255, 0.1);
+}
+
+.action-btn.delete {
+  color: #ff4d4f;
+  background-color: rgba(255, 77, 79, 0.1);
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 80rpx 0;
+  color: #999;
+}
+
+.add-btn {
+  position: fixed;
+  right: 40rpx;
+  bottom: 40rpx;
+  width: 100rpx;
+  height: 100rpx;
+  background-color: #1890ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 20rpx rgba(24, 144, 255, 0.4);
+}
+
+.add-btn text {
+  font-size: 60rpx;
+  color: #fff;
+  font-weight: 300;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  background-color: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  z-index: 101;
+}
+
+.modal-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+
+.modal-form {
+  margin-bottom: 30rpx;
+}
+
+.form-item {
+  margin-bottom: 24rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.form-input {
+  width: 100%;
+  height: 80rpx;
+  background-color: #f5f5f5;
+  border-radius: 10rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+}
+
+.picker-value {
+  width: 100%;
+  height: 80rpx;
+  background-color: #f5f5f5;
+  border-radius: 10rpx;
+  padding: 0 20rpx;
+  line-height: 80rpx;
+  font-size: 28rpx;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  border-radius: 10rpx;
+  font-size: 30rpx;
+}
+
+.modal-btn.cancel {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.modal-btn.confirm {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+}

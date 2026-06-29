@@ -1,0 +1,50 @@
+<view class="container" wx:if="{{recipe}}">
+  <view class="recipe-header">
+    <image 
+      class="recipe-image" 
+      src="{{recipe.image || '/images/default-food.png'}}" 
+      mode="aspectFill">
+    </image>
+    <view class="recipe-title">{{recipe.name}}</view>
+    <view class="recipe-meta">
+      <text class="meta-item">🕐 {{recipe.cookingTime}}分钟</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">所需食材</view>
+    <view class="ingredient-list" wx:if="{{recipe.ingredients && recipe.ingredients.length > 0}}">
+      <view 
+        class="ingredient-item" 
+        wx:for="{{recipe.ingredients}}" 
+        wx:key="index">
+        <view class="ingredient-name">{{item.ingredientName}}</view>
+        <view class="ingredient-quantity">{{item.quantity}}{{item.unit || 'g'}}</view>
+      </view>
+    </view>
+    <view class="empty-tip" wx:else>
+      <text>暂未添加食材</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">制作方法</view>
+    <view class="method-content">
+      <text>{{recipe.method || '暂无制作方法'}}</text>
+    </view>
+  </view>
+
+  <view class="action-bar">
+    <view class="order-btn" bindtap="orderRecipe">
+      <text>点这个菜</text>
+    </view>
+  </view>
+</view>
+
+<view class="loading-container" wx:elif="{{loading}}">
+  <text>加载中...</text>
+</view>
+
+<view class="error-container" wx:else>
+  <text>菜品不存在</text>
+</view>
